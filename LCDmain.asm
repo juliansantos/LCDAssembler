@@ -1,6 +1,7 @@
 
     #include "configurationBits.h"
     #define portsAsDigital 0x0F ;  Entradas digitales
+    #define DATAB LATB ; D0-D7
     #define RS LATA,0
     #define E  LATA,1
     #define CLEARSCREEN 0x01
@@ -10,9 +11,8 @@
     #define SECONDLINE 0x00
     #define THIRDLINE 0x00
     #define FOURTHLINE 0x00
-    
-    
-    
+    #define MODE8BIT5x8M 0x38
+     
     CBLOCK 0x60
     delayvar:3
     ENDC
@@ -21,18 +21,37 @@
 ;**********************************************************************MAIN FLOW    
 main:
     call initialconfig
-    
+    call setLCDup
+    call LCDCover
+    btg LATA,2
+    goto $
     bra main
+;****************************************************************INITIAL MESSAGE    
+LCDCover:   
+    movlw low msg1
+    movwf TBLPTRL
+    movlw high msg1
+    movwf TBLPTRH
+    movlw upper msg1
+    movwf TBLPTRU
+
+LCD1: tblrd*+
+    movf TABLAT,W
+    btfsc STATUS,Z
+    return
+    call pdata 
+    bra LCD1
     
 ;****************************************************************LCD SUBRUOTINES     
 enablepulse: ;-------------------------------------For Latching data in the LCD 
     bsf E ;Rising Edge
-    nop
+    movlw 0x01
+    call delayW0ms
     bcf E ;Falling Edge
     return 
     
-comand:;---------------------------------------------------For execute commands
-    movwf LATB
+command:;---------------------------------------------------For execute commands
+    movwf DATAB
     bcf RS
     call enablepulse ;To latch data 
     movlw 0x02 
@@ -40,7 +59,7 @@ comand:;---------------------------------------------------For execute commands
     return
 
 pdata:;----------------------------------------------------For print data in LCD
-    movwf LATB
+    movwf DATAB
     bsf RS
     call enablepulse ;To latch data 
     movlw 0x02 
@@ -48,8 +67,22 @@ pdata:;----------------------------------------------------For print data in LCD
     return
 
 setLCDup:;-------------------------------------------------For Initializate LCD    
-    
+    movlw 0x02
+    call delayW0ms ; Wait 10ms for Start up of LCD
+    movlw low ctrlcd ;To load the address 0x000100
+    movwf TBLPTRL
+    movlw high ctrlcd
+    movwf TBLPTRH
+    movlw upper ctrlcd
+    movwf TBLPTRU
+
+set1:    TBLRD*+
+    movf TABLAT,W   
+    btfsc  STATUS,Z 
     return
+    call command ;execute the command
+    bra set1
+
     
 ;**************************************SET UP AND INITIALIZATION MCU SUBROUTINES     
 initialconfig: 
@@ -57,11 +90,10 @@ initialconfig:
     movwf ADCON1 ;Ports as digital instead of analogic
     clrf TRISA  ;PortA as digital output
     clrf LATA  ;Initializing PortA = '0'
-    clrf TRISB ;PortC as digital output 
-    clrf LATB ;Initializing PortC 
+    clrf TRISB ;PortB as digital output 
+    clrf LATB ;Initializing PortB 
     return 
 
-    
 ;***************************************************************DELAY SUBRUTINES   
 delay10ms:  ;4MHz frecuency oscillator
     movlw d'84'  ;A Value
@@ -83,12 +115,11 @@ d2:    call delay10ms
     return
     
 ;********************************************************************DATA VECTOR
-    org 0x60
-ctrlcd:  db  DISPLAYON,CLEARSCREEN,FIRSTLINE,0,0   
-msg1:    da "    BIENVENIDOS   ",0
-msg2:    da " USTED HA INGRESADO UNA MONEDA "    
-msg3:    da " GRACIAS"    
-    
-    
+    org 0x100
+ctrlcd:  db  MODE8BIT5x8M,DISPLAYON,CLEARSCREEN,FIRSTLINE,0  ;Comandos a ejecutar 
+msg1:    da "BIENVENIDOS         ",0			    
+msg2:    da "USTED HA INGRESADO U",0    
+msg3:    da "GRACIAS             ",0
+msg4:    da "JULIAN SANTOS SA    ",0    
     
     END ;End

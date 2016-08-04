@@ -1,12 +1,12 @@
 MPLINK 5.08, LINKER
-Linker Map File - Created Wed Aug 03 01:06:48 2016
+Linker Map File - Created Wed Aug 03 22:15:22 2016
 
                                  Section Info
                   Section       Type    Address   Location Size(Bytes)
                 ---------  ---------  ---------  ---------  ---------
-                   .org_0       code   0x000000    program   0x00005e
-                   .cinit    romdata   0x00005e    program   0x000002
-                   .org_1       code   0x000060    program   0x000042
+                   .org_0       code   0x000000    program   0x0000a8
+                   .cinit    romdata   0x0000a8    program   0x000002
+                   .org_1       code   0x000100    program   0x00005e
 .config_300000_BUILD/DEFAULT/PRODUCTION/LCDMAIN    romdata   0x300000    program   0x000001
 .config_300001_BUILD/DEFAULT/PRODUCTION/LCDMAIN    romdata   0x300001    program   0x000001
 .config_300002_BUILD/DEFAULT/PRODUCTION/LCDMAIN    romdata   0x300002    program   0x000001
@@ -25,32 +25,38 @@ Linker Map File - Created Wed Aug 03 01:06:48 2016
                               Program Memory Usage 
                                Start         End      
                            ---------   ---------      
-                            0x000000    0x0000a1      
+                            0x000000    0x0000a9      
+                            0x000100    0x00015d      
                             0x300000    0x300003      
                             0x300005    0x300006      
                             0x300008    0x30000d      
-            174 out of 33048 program addresses used, program memory utilization is 0%
+            276 out of 33048 program addresses used, program memory utilization is 0%
 
 
 
                               Symbols - Sorted by Name
                      Name    Address   Location    Storage File                     
                 ---------  ---------  ---------  --------- ---------                
-                   comand   0x00000e    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
-                   ctrlcd   0x000060    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
-                       d0   0x000042    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
-                       d1   0x000048    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
-                       d2   0x000054    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
-                delay10ms   0x00003e    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
-                delayW0ms   0x000052    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
-              enablepulse   0x000006    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
-            initialconfig   0x000030    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
+                     LCD1   0x000020    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
+                 LCDCover   0x000014    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
+             _.org_0_000E   0x00000e    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
+                  command   0x00003a    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
+                   ctrlcd   0x000100    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
+                       d0   0x00008c    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
+                       d1   0x000092    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
+                       d2   0x00009e    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
+                delay10ms   0x000088    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
+                delayW0ms   0x00009c    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
+              enablepulse   0x00002e    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
+            initialconfig   0x00007a    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
                      main   0x000000    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
-                     msg1   0x000066    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
-                     msg2   0x00007a    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
-                     msg3   0x00009a    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
-                    pdata   0x00001e    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
-                 setLCDup   0x00002e    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
+                     msg1   0x000106    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
+                     msg2   0x00011c    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
+                     msg3   0x000132    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
+                     msg4   0x000148    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
+                    pdata   0x00004a    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
+                     set1   0x00006c    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
+                 setLCDup   0x00005a    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
 
 
 
@@ -58,19 +64,24 @@ Linker Map File - Created Wed Aug 03 01:06:48 2016
                      Name    Address   Location    Storage File                     
                 ---------  ---------  ---------  --------- ---------                
                      main   0x000000    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
-              enablepulse   0x000006    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
-                   comand   0x00000e    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
-                    pdata   0x00001e    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
-                 setLCDup   0x00002e    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
-            initialconfig   0x000030    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
-                delay10ms   0x00003e    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
-                       d0   0x000042    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
-                       d1   0x000048    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
-                delayW0ms   0x000052    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
-                       d2   0x000054    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
-                   ctrlcd   0x000060    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
-                     msg1   0x000066    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
-                     msg2   0x00007a    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
-                     msg3   0x00009a    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
+             _.org_0_000E   0x00000e    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
+                 LCDCover   0x000014    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
+                     LCD1   0x000020    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
+              enablepulse   0x00002e    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
+                  command   0x00003a    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
+                    pdata   0x00004a    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
+                 setLCDup   0x00005a    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
+                     set1   0x00006c    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
+            initialconfig   0x00007a    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
+                delay10ms   0x000088    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
+                       d0   0x00008c    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
+                       d1   0x000092    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
+                delayW0ms   0x00009c    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
+                       d2   0x00009e    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
+                   ctrlcd   0x000100    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
+                     msg1   0x000106    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
+                     msg2   0x00011c    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
+                     msg3   0x000132    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
+                     msg4   0x000148    program     static C:\Users\Julian Santos\MPLABXProjects\LCDAssembler.X\LCDmain.asm
 
 

@@ -1,4 +1,4 @@
-MPASM 5.68                       LCDMAIN.ASM   8-3-2016  1:06:44         PAGE  1
+MPASM 5.68                       LCDMAIN.ASM   8-3-2016  22:15:21         PAGE  1
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -57,7 +57,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
                             power operation)
                       00032   CONFIG  MCLRE = ON            ; MCLR Pin Enable bit (MCLR pin enabled; RE3 input pin disabled)
                       00033 
-MPASM 5.68                       LCDMAIN.ASM   8-3-2016  1:06:44         PAGE  2
+MPASM 5.68                       LCDMAIN.ASM   8-3-2016  22:15:21         PAGE  2
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -109,24 +109,24 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
                             ot protected from table reads executed in other blocks)
                       00068 
                       00003     #define portsAsDigital 0x0F ;  Entradas digitales
-                      00004     #define RS LATA,0
-                      00005     #define E  LATA,1
-                      00006     #define CLEARSCREEN 0x01
-                      00007     #define DISPLAYON 0x0C
-                      00008     #define DISPLAYOFF 0x0A
-                      00009     #define FIRSTLINE 0x80
-                      00010     #define SECONDLINE 0x00
-MPASM 5.68                       LCDMAIN.ASM   8-3-2016  1:06:44         PAGE  3
+                      00004     #define DATAB LATB ; D0-D7
+                      00005     #define RS LATA,0
+                      00006     #define E  LATA,1
+                      00007     #define CLEARSCREEN 0x01
+                      00008     #define DISPLAYON 0x0C
+                      00009     #define DISPLAYOFF 0x0A
+                      00010     #define FIRSTLINE 0x80
+MPASM 5.68                       LCDMAIN.ASM   8-3-2016  22:15:21         PAGE  3
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-                      00011     #define THIRDLINE 0x00
-                      00012     #define FOURTHLINE 0x00
-                      00013     
-                      00014     
-                      00015     
+                      00011     #define SECONDLINE 0x00
+                      00012     #define THIRDLINE 0x00
+                      00013     #define FOURTHLINE 0x00
+                      00014     #define MODE8BIT5x8M 0x38
+                      00015      
                       00016     CBLOCK 0x60
   00000060            00017     delayvar:3
                       00018     ENDC
@@ -135,96 +135,136 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
                       00021 ;**********************************************************************MAIN FLOW    
 000000                00022 main:
 000000 EC?? F???      00023     call initialconfig
-                      00024    
-000004 D???           00025     bra main
-                      00026     
-                      00027 ;****************************************************************LCD SUBRUOTINES     
-000006                00028 enablepulse: ;-------------------------------------For Latching data in the LCD 
-000006 8289           00029     bsf E ;Rising Edge
-000008 0000           00030     nop
-00000A 9289           00031     bcf E ;Falling Edge
-00000C 0012           00032     return 
-                      00033     
-00000E                00034 comand:;---------------------------------------------------;--------------------------------------------
-                            -------For execute commands
-00000E 6E8A           00035     movwf LATB
-000010 9089           00036     bcf RS
-000012 EC?? F???      00037     call enablepulse ;To latch data 
-000016 0E02           00038     movlw 0x02 
-000018 EC?? F???      00039     call delayW0ms ;Delay for 20ms    
-00001C 0012           00040     return
-                      00041 
-00001E                00042 pdata:;----------------------------------------------------;--------------------------------------------
+000004 EC?? F???      00024     call setLCDup
+000008 EC?? F???      00025     call LCDCover
+00000C 7489           00026     btg LATA,2
+00000E EF?? F???      00027     goto $
+000012 D???           00028     bra main
+                      00029 ;****************************************************************INITIAL MESSAGE    
+000014                00030 LCDCover:   
+000014 0E??           00031     movlw low msg1
+000016 6EF6           00032     movwf TBLPTRL
+000018 0E??           00033     movlw high msg1
+00001A 6EF7           00034     movwf TBLPTRH
+00001C 0E??           00035     movlw upper msg1
+00001E 6EF8           00036     movwf TBLPTRU
+                      00037 
+000020 0009           00038 LCD1: tblrd*+
+000022 50F5           00039     movf TABLAT,W
+000024 B4D8           00040     btfsc STATUS,Z
+000026 0012           00041     return
+000028 EC?? F???      00042     call pdata 
+00002C D???           00043     bra LCD1
+                      00044     
+                      00045 ;****************************************************************LCD SUBRUOTINES     
+00002E                00046 enablepulse: ;-------------------------------------For Latching data in the LCD 
+00002E 8289           00047     bsf E ;Rising Edge
+000030 0E01           00048     movlw 0x01
+000032 EC?? F???      00049     call delayW0ms
+000036 9289           00050     bcf E ;Falling Edge
+000038 0012           00051     return 
+                      00052     
+00003A                00053 command:;---------------------------------------------------;-------------------------------------------
+                            --------For execute commands
+00003A 6E8A           00054     movwf DATAB
+00003C 9089           00055     bcf RS
+00003E EC?? F???      00056     call enablepulse ;To latch data 
+000042 0E02           00057     movlw 0x02 
+000044 EC?? F???      00058     call delayW0ms ;Delay for 20ms    
+000048 0012           00059     return
+                      00060 
+00004A                00061 pdata:;----------------------------------------------------;--------------------------------------------
                             --------For print data in LCD
-00001E 6E8A           00043     movwf LATB
-000020 8089           00044     bsf RS
-000022 EC?? F???      00045     call enablepulse ;To latch data 
-000026 0E02           00046     movlw 0x02 
-000028 EC?? F???      00047     call delayW0ms ;Delay for 20ms  
-00002C 0012           00048     return
-                      00049 
-00002E                00050 setLCDup:;-------------------------------------------------;--------------------------------------------
-                            -----For Initializate LCD    
-                      00051     
-00002E 0012           00052     return
-                      00053     
-                      00054 ;**************************************SET UP AND INITIALIZATION MCU SUBROUTINES     
-000030                00055 initialconfig: 
-000030 0E0F           00056     movlw portsAsDigital
-000032 6EC1           00057     movwf ADCON1 ;Ports as digital instead of analogic
-000034 6A92           00058     clrf TRISA  ;PortA as digital output
-000036 6A89           00059     clrf LATA  ;Initializing PortA = '0'
-000038 6A93           00060     clrf TRISB ;PortC as digital output 
-MPASM 5.68                       LCDMAIN.ASM   8-3-2016  1:06:44         PAGE  4
+MPASM 5.68                       LCDMAIN.ASM   8-3-2016  22:15:21         PAGE  4
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-00003A 6A8A           00061     clrf LATB ;Initializing PortC 
-00003C 0012           00062     return 
-                      00063 
-                      00064     
-                      00065 ;***************************************************************DELAY SUBRUTINES   
-00003E                00066 delay10ms:  ;4MHz frecuency oscillator
-00003E 0E54           00067     movlw d'84'  ;A Value
-000040 6F61           00068     movwf delayvar+1
-000042 0E26           00069 d0:   movlw d'38' ;B Value
-000044 6F60           00070     movwf delayvar  
-000046 0000           00071     nop
-000048 2F60           00072 d1:  decfsz delayvar,F
-00004A D???           00073     bra d1
-00004C 2F61           00074     decfsz delayvar+1,F
-00004E D???           00075     bra d0      
-000050 0012           00076     return ;2+1+1+A[1+1+1+B+1+2B-2]+A+1+2A-2+2 => 5+A[5+3B]
-                      00077     
-000052                00078 delayW0ms: ;It is neccesary load a properly value in the acumulator before use this subrutine
-000052 6F62           00079     movwf delayvar+2
-000054 EC?? F???      00080 d2:    call delay10ms
-000058 2F62           00081     decfsz delayvar+2,F
-00005A D???           00082     bra d2
-00005C 0012           00083     return
-                      00084     
-                      00085 ;********************************************************************DATA VECTOR
-                      00086     org 0x60
-000060 010C 0080 0000 00087 ctrlcd:  db  DISPLAYON,CLEARSCREEN,FIRSTLINE,0,0   
-000066 2020 2020 4942 00088 msg1:    da "    BIENVENIDOS   ",0
-       4E45 4556 494E 
-       4F44 2053 2020 
-       0000 
-00007A 5520 5453 4445 00089 msg2:    da " USTED HA INGRESADO UNA MONEDA "    
-       4820 2041 4E49 
-       5247 5345 4441 
-       204F 4E55 2041 
-       4F4D 454E 4144 
-       0020 
-00009A 4720 4152 4943 00090 msg3:    da " GRACIAS"    
-       5341 
-                      00091     
-                      00092     
-                      00093     
-                      00094     END ;End
-MPASM 5.68                       LCDMAIN.ASM   8-3-2016  1:06:44         PAGE  5
+00004A 6E8A           00062     movwf DATAB
+00004C 8089           00063     bsf RS
+00004E EC?? F???      00064     call enablepulse ;To latch data 
+000052 0E02           00065     movlw 0x02 
+000054 EC?? F???      00066     call delayW0ms ;Delay for 20ms  
+000058 0012           00067     return
+                      00068 
+00005A                00069 setLCDup:;-------------------------------------------------;--------------------------------------------
+                            -----For Initializate LCD    
+00005A 0E02           00070     movlw 0x02
+00005C EC?? F???      00071     call delayW0ms ; Wait 10ms for Start up of LCD
+000060 0E??           00072     movlw low ctrlcd ;To load the address 0x000100
+000062 6EF6           00073     movwf TBLPTRL
+000064 0E??           00074     movlw high ctrlcd
+000066 6EF7           00075     movwf TBLPTRH
+000068 0E??           00076     movlw upper ctrlcd
+00006A 6EF8           00077     movwf TBLPTRU
+                      00078 
+00006C 0009           00079 set1:    TBLRD*+
+00006E 50F5           00080     movf TABLAT,W   
+000070 B4D8           00081     btfsc  STATUS,Z 
+000072 0012           00082     return
+000074 EC?? F???      00083     call command ;execute the command
+000078 D???           00084     bra set1
+                      00085 
+                      00086     
+                      00087 ;**************************************SET UP AND INITIALIZATION MCU SUBROUTINES     
+00007A                00088 initialconfig: 
+00007A 0E0F           00089     movlw portsAsDigital
+00007C 6EC1           00090     movwf ADCON1 ;Ports as digital instead of analogic
+00007E 6A92           00091     clrf TRISA  ;PortA as digital output
+000080 6A89           00092     clrf LATA  ;Initializing PortA = '0'
+000082 6A93           00093     clrf TRISB ;PortB as digital output 
+000084 6A8A           00094     clrf LATB ;Initializing PortB 
+000086 0012           00095     return 
+                      00096 
+                      00097 ;***************************************************************DELAY SUBRUTINES   
+000088                00098 delay10ms:  ;4MHz frecuency oscillator
+000088 0E54           00099     movlw d'84'  ;A Value
+00008A 6F61           00100     movwf delayvar+1
+00008C 0E26           00101 d0:   movlw d'38' ;B Value
+00008E 6F60           00102     movwf delayvar  
+000090 0000           00103     nop
+000092 2F60           00104 d1:  decfsz delayvar,F
+000094 D???           00105     bra d1
+000096 2F61           00106     decfsz delayvar+1,F
+000098 D???           00107     bra d0      
+00009A 0012           00108     return ;2+1+1+A[1+1+1+B+1+2B-2]+A+1+2A-2+2 => 5+A[5+3B]
+                      00109     
+00009C                00110 delayW0ms: ;It is neccesary load a properly value in the acumulator before use this subrutine
+00009C 6F62           00111     movwf delayvar+2
+00009E EC?? F???      00112 d2:    call delay10ms
+0000A2 2F62           00113     decfsz delayvar+2,F
+MPASM 5.68                       LCDMAIN.ASM   8-3-2016  22:15:21         PAGE  5
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0000A4 D???           00114     bra d2
+0000A6 0012           00115     return
+                      00116     
+                      00117 ;********************************************************************DATA VECTOR
+                      00118     org 0x100
+000100 0C38 8001 0000 00119 ctrlcd:  db  MODE8BIT5x8M,DISPLAYON,CLEARSCREEN,FIRSTLINE,0  ;Comandos a ejecutar 
+000106 4942 4E45 4556 00120 msg1:    da "BIENVENIDOS         ",0                        
+       494E 4F44 2053 
+       2020 2020 2020 
+       2020 0000 
+00011C 5355 4554 2044 00121 msg2:    da "USTED HA INGRESADO U",0    
+       4148 4920 474E 
+       4552 4153 4F44 
+       5520 0000 
+000132 5247 4341 4149 00122 msg3:    da "GRACIAS             ",0
+       2053 2020 2020 
+       2020 2020 2020 
+       2020 0000 
+000148 554A 494C 4E41 00123 msg4:    da "JULIAN SANTOS SA    ",0    
+       5320 4E41 4F54 
+       2053 4153 2020 
+       2020 0000 
+                      00124     
+                      00125     END ;End
+MPASM 5.68                       LCDMAIN.ASM   8-3-2016  22:15:21         PAGE  6
 
 
 SYMBOL TABLE
@@ -283,7 +323,7 @@ BRG16                             00000003
 BRGH                              00000002
 BSR                               00000FE0
 BTOEE                             00000004
-MPASM 5.68                       LCDMAIN.ASM   8-3-2016  1:06:44         PAGE  6
+MPASM 5.68                       LCDMAIN.ASM   8-3-2016  22:15:21         PAGE  7
 
 
 SYMBOL TABLE
@@ -342,7 +382,7 @@ CMIP                              00000006
 CRC16EE                           00000002
 CRC16EF                           00000002
 CRC5EE                            00000001
-MPASM 5.68                       LCDMAIN.ASM   8-3-2016  1:06:44         PAGE  7
+MPASM 5.68                       LCDMAIN.ASM   8-3-2016  22:15:21         PAGE  8
 
 
 SYMBOL TABLE
@@ -362,6 +402,7 @@ CVROE                             00000006
 CVRR                              00000005
 CVRSS                             00000004
 D                                 00000005
+DATAB                             LATB
 DATA_ADDRESS                      00000005
 DC                                00000001
 DC1B0                             00000004
@@ -400,13 +441,13 @@ ENDP0                             00000003
 ENDP1                             00000004
 ENDP2                             00000005
 ENDP3                             00000006
-EPCONDIS                          00000003
-MPASM 5.68                       LCDMAIN.ASM   8-3-2016  1:06:44         PAGE  8
+MPASM 5.68                       LCDMAIN.ASM   8-3-2016  22:15:21         PAGE  9
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
+EPCONDIS                          00000003
 EPHSHK                            00000004
 EPINEN                            00000001
 EPOUTEN                           00000002
@@ -459,13 +500,13 @@ HLVDL3                            00000003
 I2C_DAT                           00000005
 I2C_READ                          00000002
 I2C_START                         00000003
-I2C_STOP                          00000004
-MPASM 5.68                       LCDMAIN.ASM   8-3-2016  1:06:44         PAGE  9
+MPASM 5.68                       LCDMAIN.ASM   8-3-2016  22:15:21         PAGE 10
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
+I2C_STOP                          00000004
 IDLEIE                            00000004
 IDLEIF                            00000004
 IDLEN                             00000007
@@ -518,13 +559,13 @@ LATA6                             00000006
 LATB                              00000F8A
 LATB0                             00000000
 LATB1                             00000001
-LATB2                             00000002
-MPASM 5.68                       LCDMAIN.ASM   8-3-2016  1:06:44         PAGE 10
+MPASM 5.68                       LCDMAIN.ASM   8-3-2016  22:15:21         PAGE 11
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
+LATB2                             00000002
 LATB3                             00000003
 LATB4                             00000004
 LATB5                             00000005
@@ -536,6 +577,8 @@ LATC1                             00000001
 LATC2                             00000002
 LATC6                             00000006
 LATC7                             00000007
+LCD1                              00000020
+LCDCover                          00000014
 LVDCON                            00000FD2
 LVDEN                             00000004
 LVDIE                             00000002
@@ -550,6 +593,7 @@ LVV0                              00000000
 LVV1                              00000001
 LVV2                              00000002
 LVV3                              00000003
+MODE8BIT5x8M                      0x38
 N                                 00000004
 NOT_A                             00000005
 NOT_ADDRESS                       00000005
@@ -574,16 +618,16 @@ OSCFIP                            00000007
 OSCTUNE                           00000F9B
 OSTS                              00000003
 OV                                00000003
-P                                 00000004
-P1A                               00000002
-PC                                00000FF9
-PCFG0                             00000000
-MPASM 5.68                       LCDMAIN.ASM   8-3-2016  1:06:44         PAGE 11
+MPASM 5.68                       LCDMAIN.ASM   8-3-2016  22:15:21         PAGE 12
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
+P                                 00000004
+P1A                               00000002
+PC                                00000FF9
+PCFG0                             00000000
 PCFG1                             00000001
 PCFG2                             00000002
 PCFG3                             00000003
@@ -633,16 +677,16 @@ PRSEN                             00000007
 PSA                               00000003
 PSSAC0                            00000002
 PSSAC1                            00000003
-R                                 00000002
-RA0                               00000000
-RA1                               00000001
-RA2                               00000002
-MPASM 5.68                       LCDMAIN.ASM   8-3-2016  1:06:44         PAGE 12
+MPASM 5.68                       LCDMAIN.ASM   8-3-2016  22:15:21         PAGE 13
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
+R                                 00000002
+RA0                               00000000
+RA1                               00000001
+RA2                               00000002
 RA3                               00000003
 RA4                               00000004
 RA5                               00000005
@@ -692,16 +736,16 @@ R_W                               00000002
 S                                 00000003
 SBOREN                            00000006
 SCKP                              00000004
-SCS0                              00000000
-SCS1                              00000001
-SE0                               00000005
-SECONDLINE                        0x00
-MPASM 5.68                       LCDMAIN.ASM   8-3-2016  1:06:44         PAGE 13
+MPASM 5.68                       LCDMAIN.ASM   8-3-2016  22:15:21         PAGE 14
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
+SCS0                              00000000
+SCS1                              00000001
+SE0                               00000005
+SECONDLINE                        0x00
 SEN                               00000000
 SENDB                             00000003
 SMP                               00000007
@@ -751,16 +795,16 @@ T0IP                              00000002
 T0PS0                             00000000
 T0PS1                             00000001
 T0PS2                             00000002
-T0SE                              00000004
-T13CKI                            00000000
-T1CKPS0                           00000004
-T1CKPS1                           00000005
-MPASM 5.68                       LCDMAIN.ASM   8-3-2016  1:06:44         PAGE 14
+MPASM 5.68                       LCDMAIN.ASM   8-3-2016  22:15:21         PAGE 15
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
+T0SE                              00000004
+T13CKI                            00000000
+T1CKPS0                           00000004
+T1CKPS1                           00000005
 T1CON                             00000FCD
 T1OSCEN                           00000003
 T1OSI                             00000001
@@ -810,16 +854,16 @@ TMR2ON                            00000002
 TMR3                              00000FB2
 TMR3CS                            00000001
 TMR3H                             00000FB3
-TMR3IE                            00000001
-TMR3IF                            00000001
-TMR3IP                            00000001
-TMR3L                             00000FB2
-MPASM 5.68                       LCDMAIN.ASM   8-3-2016  1:06:44         PAGE 15
+MPASM 5.68                       LCDMAIN.ASM   8-3-2016  22:15:21         PAGE 16
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
+TMR3IE                            00000001
+TMR3IF                            00000001
+TMR3IP                            00000001
+TMR3L                             00000FB2
 TMR3ON                            00000000
 TO                                00000003
 TOS                               00000FFD
@@ -869,16 +913,16 @@ TXEN                              00000005
 TXIE                              00000004
 TXIF                              00000004
 TXIP                              00000004
-TXREG                             00000FAD
-TXSTA                             00000FAC
-UA                                00000001
-UADDR                             00000F6E
-MPASM 5.68                       LCDMAIN.ASM   8-3-2016  1:06:44         PAGE 16
+MPASM 5.68                       LCDMAIN.ASM   8-3-2016  22:15:21         PAGE 17
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
+TXREG                             00000FAD
+TXSTA                             00000FAC
+UA                                00000001
+UADDR                             00000F6E
 UCFG                              00000F6F
 UCON                              00000F6D
 UEIE                              00000F6B
@@ -928,16 +972,17 @@ WDTCON                            00000FD1
 WR                                00000001
 WREG                              00000FE8
 WREN                              00000002
-WRERR                             00000003
-WUE                               00000001
-Z                                 00000002
-_BORV_0_2L                        000000E7
-MPASM 5.68                       LCDMAIN.ASM   8-3-2016  1:06:44         PAGE 17
+MPASM 5.68                       LCDMAIN.ASM   8-3-2016  22:15:21         PAGE 18
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
+WRERR                             00000003
+WUE                               00000001
+Z                                 00000002
+_.org_0_000E                      0000000E
+_BORV_0_2L                        000000E7
 _BORV_1_2L                        000000EF
 _BORV_2_2L                        000000F7
 _BORV_3_2L                        000000FF
@@ -986,17 +1031,17 @@ _EBTR1_ON_7L                      000000FD
 _EBTR2_OFF_7L                     000000FF
 _EBTR2_ON_7L                      000000FB
 _EBTR3_OFF_7L                     000000FF
-_EBTR3_ON_7L                      000000F7
-_EBTRB_OFF_7H                     000000FF
-_EBTRB_ON_7H                      000000BF
-_FCMEN_OFF_1H                     000000BF
-_FCMEN_ON_1H                      000000FF
-MPASM 5.68                       LCDMAIN.ASM   8-3-2016  1:06:44         PAGE 18
+MPASM 5.68                       LCDMAIN.ASM   8-3-2016  22:15:21         PAGE 19
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
+_EBTR3_ON_7L                      000000F7
+_EBTRB_OFF_7H                     000000FF
+_EBTRB_ON_7H                      000000BF
+_FCMEN_OFF_1H                     000000BF
+_FCMEN_ON_1H                      000000FF
 _FOSC_ECIO_EC_1H                  000000F4
 _FOSC_ECPLLIO_EC_1H               000000F6
 _FOSC_ECPLL_EC_1H                 000000F7
@@ -1045,17 +1090,17 @@ _VREGEN_OFF_2L                    000000DF
 _VREGEN_ON_2L                     000000FF
 _WDTPS_1024_2H                    000000F5
 _WDTPS_128_2H                     000000EF
-_WDTPS_16384_2H                   000000FD
-_WDTPS_16_2H                      000000E9
-_WDTPS_1_2H                       000000E1
-_WDTPS_2048_2H                    000000F7
-_WDTPS_256_2H                     000000F1
-MPASM 5.68                       LCDMAIN.ASM   8-3-2016  1:06:44         PAGE 19
+MPASM 5.68                       LCDMAIN.ASM   8-3-2016  22:15:21         PAGE 20
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
+_WDTPS_16384_2H                   000000FD
+_WDTPS_16_2H                      000000E9
+_WDTPS_1_2H                       000000E1
+_WDTPS_2048_2H                    000000F7
+_WDTPS_256_2H                     000000F1
 _WDTPS_2_2H                       000000E3
 _WDTPS_32768_2H                   000000FF
 _WDTPS_32_2H                      000000EB
@@ -1084,23 +1129,31 @@ _WRTD_ON_6H                       0000007F
 _XINST_OFF_4L                     000000BF
 _XINST_ON_4L                      000000FF
 __18F2550                         00000001
-comand                            0000000E
-ctrlcd                            00000060
-d0                                00000042
-d1                                00000048
-d2                                00000054
-delay10ms                         0000003E
-delayW0ms                         00000052
+command                           0000003A
+ctrlcd                            00000100
+d0                                0000008C
+d1                                00000092
+d2                                0000009E
+delay10ms                         00000088
+delayW0ms                         0000009C
 delayvar                          00000060
-enablepulse                       00000006
-initialconfig                     00000030
+enablepulse                       0000002E
+initialconfig                     0000007A
 main                              00000000
-msg1                              00000066
-msg2                              0000007A
-msg3                              0000009A
-pdata                             0000001E
+msg1                              00000106
+msg2                              0000011C
+msg3                              00000132
+msg4                              00000148
+pdata                             0000004A
 portsAsDigital                    0x0F
-setLCDup                          0000002E
+set1                              0000006C
+setLCDup                          0000005A
+
+MPASM 5.68                       LCDMAIN.ASM   8-3-2016  22:15:21         PAGE 21
+
+
+
+
 
 Errors   :     0
 Warnings :     0 reported,     0 suppressed
